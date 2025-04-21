@@ -1,6 +1,5 @@
 package me.jeremiah.stablemobs;
 
-import com.destroystokyo.paper.event.server.ServerTickStartEvent;
 import me.jeremiah.stablemobs.levelling.MobType;
 import me.jeremiah.stablemobs.levelling.mobs.AbstractLevelledMob;
 import org.bukkit.Bukkit;
@@ -31,20 +30,21 @@ public class MobManager implements Listener {
 
   MobManager(StableMobs plugin) {
     Bukkit.getPluginManager().registerEvents(this, plugin);
-  }
-
-  @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-  public void onServerTickStart(ServerTickStartEvent event) {
-    int tick = event.getTickNumber();
-    if (tick % 10 == 0)
+    Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+      int tick = Bukkit.getCurrentTick();
+      Set<AbstractLevelledMob<?>> toRemove = new HashSet<>();
       for (AbstractLevelledMob<?> mob : tracker.getMobs()) {
         if (mob.getMob().isDead()) {
-          tracker.removeMob(mob);
+          toRemove.add(mob);
           continue;
         }
         mob.tick(tick);
       }
+      for (AbstractLevelledMob<?> mob : toRemove)
+        tracker.removeMob(mob);
+    }, 10, 10);
   }
+
 
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onEntitySpawn(EntitySpawnEvent event) {

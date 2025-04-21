@@ -4,8 +4,9 @@ import lombok.Getter;
 import me.jeremiah.stablemobs.StableMobs;
 import me.jeremiah.stablemobs.levelling.Hostility;
 import me.jeremiah.stablemobs.levelling.MobType;
-import me.jeremiah.stablemobs.levelling.modifier.ModifierContext;
+import me.jeremiah.stablemobs.levelling.modifier.LevelModifier;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Mob;
@@ -15,6 +16,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Map;
 
 @Getter
@@ -24,10 +26,12 @@ public abstract class AbstractLevelledMob<T extends Mob> implements MobDataHolde
   private final @NotNull MobType type;
 
   private int level;
+  private final LevelModifier[] modifiers;
 
   protected AbstractLevelledMob(@NotNull T mob) {
     this.mob = mob;
     type = MobType.getMobType(mob);
+    modifiers = Arrays.stream(LevelModifier.values()).filter(modifier -> modifier.test(this)).toArray(LevelModifier[]::new);
     if (mob.getTicksLived() == 0) {
       mob.setCustomNameVisible(true);
       PersistentDataContainer container = mob.getPersistentDataContainer();
@@ -40,11 +44,20 @@ public abstract class AbstractLevelledMob<T extends Mob> implements MobDataHolde
 
   public abstract @NotNull Component getDisplayName();
 
+  @SuppressWarnings("DataFlowIssue")
+  protected @NotNull NamedTextColor getLevelColor() {
+    return getHostility().getColor();
+  }
+
   public abstract int getBaseLevel();
 
   public abstract @NotNull Hostility getHostility();
 
-  protected abstract int applyLevelModifiers(int level, ModifierContext context);
+  protected int applyLevelModifiers(int level) {
+    for (LevelModifier modifier : modifiers)
+      level = modifier.apply(level, this);
+    return Math.max(1, level);
+  }
 
   public abstract @NotNull Map<Attribute, Double> getAttributes();
 
@@ -58,9 +71,8 @@ public abstract class AbstractLevelledMob<T extends Mob> implements MobDataHolde
     }
 
     int level = getBaseLevel();
-    ModifierContext context = new ModifierContext.Builder(this).build();
 
-    level = applyLevelModifiers(level, context);
+    level = applyLevelModifiers(level);
     this.level = level;
 
     updateMob();

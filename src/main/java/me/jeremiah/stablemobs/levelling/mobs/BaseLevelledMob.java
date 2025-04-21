@@ -1,7 +1,5 @@
 package me.jeremiah.stablemobs.levelling.mobs;
 
-import me.jeremiah.stablemobs.levelling.modifier.LevelModifier;
-import me.jeremiah.stablemobs.levelling.modifier.ModifierContext;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.attribute.Attribute;
@@ -19,20 +17,12 @@ public abstract class BaseLevelledMob<T extends Mob> extends AbstractLevelledMob
   }
 
   @Override
-  protected int applyLevelModifiers(int level, ModifierContext context) {
-    level = LevelModifier.SPAWN_DISTANCE_MODIFIER.apply(level, context);
-    level = LevelModifier.DIFFICULTY_MODIFIER.apply(level, context);
-    return Math.max(1, level);
-  }
-
-  @Override
-  public @NotNull String getName() {
-    return getMob().getType().name();
-  }
-
-  @Override
   public @NotNull Component getDisplayName() {
-    String rawName = String.format("<aqua>%d</aqua> <gray>%s</gray>", getLevel(), getName());
+    String levelColor = getLevelColor().toString();
+    int level = getLevel();
+    String name = getName();
+    int health = (int) getMob().getHealth();
+    String rawName = String.format("<%s>%d<%s> <gray>%s</gray> <red>%d ❤</red>", levelColor, level, levelColor, name, health);
     return MiniMessage.miniMessage().deserialize(rawName);
   }
 

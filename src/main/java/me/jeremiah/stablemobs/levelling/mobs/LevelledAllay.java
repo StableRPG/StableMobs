@@ -1,8 +1,6 @@
 package me.jeremiah.stablemobs.levelling.mobs;
 
 import me.jeremiah.stablemobs.levelling.Hostility;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Allay;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,12 +13,6 @@ public class LevelledAllay extends BaseLevelledMob<@NotNull Allay> {
   @Override
   public @NotNull String getName() {
     return "Allay";
-  }
-
-  @Override
-  public @NotNull Component getDisplayName() {
-    String rawName = String.format("<aqua>%d</aqua> <gray>%s</gray>", getLevel(), getName());
-    return MiniMessage.miniMessage().deserialize(rawName);
   }
 
   @Override
