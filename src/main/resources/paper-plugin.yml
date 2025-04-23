@@ -1,6 +1,0 @@
-name: StableMobs
-version: '1.0.0'
-main: me.jeremiah.stablemobs.StableMobs
-api-version: '1.21'
-load: STARTUP
-authors: [ ImNotStable ]
