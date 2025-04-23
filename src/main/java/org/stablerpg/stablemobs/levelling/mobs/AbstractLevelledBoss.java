@@ -18,8 +18,8 @@ public abstract class AbstractLevelledBoss<T extends Mob> extends AbstractLevell
     String levelColor = getLevelColor().toString();
     int level = getLevel();
     String name = getName();
-    int health = (int) getMob().getHealth();
-    String rawName = String.format("<%s><bold>%d</bold><%s> <gray>%s</gray> <red>%d ❤</red>", levelColor, level, levelColor, name, health);
+    int health = (int) getHealth();
+    String rawName = String.format("<%s><bold>%d</bold></%s> <gray>%s</gray> <red>%d ❤</red>", levelColor, level, levelColor, name, health);
     return MiniMessage.miniMessage().deserialize(rawName);
   }
 

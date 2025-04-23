@@ -10,7 +10,6 @@ import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 @RequiredArgsConstructor
-
 public enum LevelModifier implements Predicate<AbstractLevelledMob<?>>, BiFunction<Integer, AbstractLevelledMob<?>, Integer> {
 
   END_MODIFIER(mob -> {
