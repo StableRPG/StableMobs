@@ -1,15 +1,16 @@
 package org.stablerpg.stablemobs.levelling.modifier;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.stablerpg.stablemobs.levelling.Hostility;
 import org.stablerpg.stablemobs.levelling.mobs.AbstractLevelledMob;
+import org.stablerpg.stablemobs.util.MathUtil;
 
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 public enum LevelModifier implements Predicate<AbstractLevelledMob<?>>, BiFunction<Integer, AbstractLevelledMob<?>, Integer> {
 
   END_MODIFIER(mob -> {
@@ -47,9 +48,7 @@ public enum LevelModifier implements Predicate<AbstractLevelledMob<?>>, BiFuncti
   SPAWN_DISTANCE_MODIFIER((level, mob) -> {
     double x = mob.getSpawnX();
     double z = mob.getSpawnZ();
-    double log = StrictMath.log(Math.sqrt((x * x) + (z * z)) + 9.0);
-    double log9 = log / StrictMath.log(9.0);
-    return (int) (level * log9);
+    return (int) (level * MathUtil.log(MathUtil.pythagorean(x, z) + 9.0, 9));
   });
 
   private final Predicate<AbstractLevelledMob<?>> predicate;
@@ -60,13 +59,13 @@ public enum LevelModifier implements Predicate<AbstractLevelledMob<?>>, BiFuncti
   }
 
   @Override
-  public boolean test(AbstractLevelledMob<?> modifierContext) {
-    return predicate.test(modifierContext);
+  public boolean test(AbstractLevelledMob<?> mob) {
+    return predicate.test(mob);
   }
 
   @Override
-  public Integer apply(Integer level, AbstractLevelledMob<?> modifierContext) {
-    return modifier.apply(level, modifierContext);
+  public Integer apply(Integer level, AbstractLevelledMob<?> mob) {
+    return modifier.apply(level, mob);
   }
 
 }

@@ -7,8 +7,8 @@ plugins {
     id("xyz.jpenilla.resource-factory-paper-convention") version "1.2.0"
 }
 
-group = "org.stablerpg.stablemobs"
-version = "1.0.0"
+setGroup("org.stablerpg.stablemobs")
+setVersion("1.0.0")
 
 repositories {
     mavenCentral()
@@ -39,13 +39,13 @@ tasks {
         dependsOn(shadowJar)
     }
     paperweight {
-        reobfArtifactConfiguration = ReobfArtifactConfiguration.MOJANG_PRODUCTION
+        reobfArtifactConfiguration.set(ReobfArtifactConfiguration.MOJANG_PRODUCTION)
     }
     paperPluginYaml {
         name.set(rootProject.name)
         main.set("${project.group}.${rootProject.name}")
         apiVersion.set("1.21")
-        loader.set("STARTUP")
+        paperPluginYaml.
         author.set("ImNotStable")
     }
 }

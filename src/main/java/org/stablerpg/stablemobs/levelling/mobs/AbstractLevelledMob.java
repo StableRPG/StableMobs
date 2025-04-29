@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.stablerpg.stablemobs.StableMobs;
 import org.stablerpg.stablemobs.levelling.Hostility;
 import org.stablerpg.stablemobs.levelling.modifier.LevelModifier;
+import org.stablerpg.stablemobs.levelling.modifier.MobModifier;
 
 import java.util.Arrays;
 
@@ -18,11 +19,13 @@ import java.util.Arrays;
 public abstract class AbstractLevelledMob<T extends Mob> extends SimpleMobImpl<T> {
 
   private int level;
-  private final LevelModifier[] modifiers;
+  private final LevelModifier[] levelModifiers;
+  private final MobModifier[] mobModifiers;
 
   protected AbstractLevelledMob(@NotNull T mob) {
     super(mob);
-    modifiers = Arrays.stream(LevelModifier.values()).filter(modifier -> modifier.test(this)).toArray(LevelModifier[]::new);
+    levelModifiers = Arrays.stream(LevelModifier.values()).filter(modifier -> modifier.test(this)).toArray(LevelModifier[]::new);
+    mobModifiers = Arrays.stream(MobModifier.values()).filter(modifier -> modifier.test(this)).toArray(MobModifier[]::new);
     if (mob.getTicksLived() == 0) {
       mob.setCustomNameVisible(true);
       setPersistentData(StableMobs.getPluginKey("spawn-x"), PersistentDataType.INTEGER, mob.getChunk().getX());
@@ -50,7 +53,7 @@ public abstract class AbstractLevelledMob<T extends Mob> extends SimpleMobImpl<T
   public abstract @NotNull Hostility getHostility();
 
   protected int applyLevelModifiers(int level) {
-    for (LevelModifier modifier : modifiers)
+    for (LevelModifier modifier : levelModifiers)
       level = modifier.apply(level, this);
     return Math.max(1, level);
   }
@@ -72,6 +75,8 @@ public abstract class AbstractLevelledMob<T extends Mob> extends SimpleMobImpl<T
     customName(getDisplayName());
 
     getBaseAttributes().forEach(this::setAttributeBaseValue);
+    for (MobModifier modifier : mobModifiers)
+      modifier.accept(this);
 
     LootTable lootTable = getLootTable();
     if (lootTable != null)

@@ -180,6 +180,19 @@ public interface SimpleMob<T extends Mob> {
     instance.removeModifier(modifier);
   }
 
+  default void replaceAttributeModifier(@NotNull Attribute attribute, @NotNull AttributeModifier modifier) {
+    AttributeInstance instance = getAttribute(attribute);
+    if (instance == null) {
+      String attributeName = attribute.getKey().asMinimalString();
+      String type = getType().name();
+      StableMobs.logger().warning("Attribute " + attributeName + " is not registered for mob " + type);
+      return;
+    }
+    if (instance.getModifier(modifier.getKey()) != null)
+      instance.removeModifier(modifier.getKey());
+    instance.addModifier(modifier);
+  }
+
   default double getAttributeValue(@NotNull Attribute attribute) {
     AttributeInstance instance = getAttribute(attribute);
     if (instance == null) {
